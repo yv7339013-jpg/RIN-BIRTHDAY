@@ -366,6 +366,14 @@
     100% { opacity: 0; transform: translateY(-120px) rotate(25deg) scale(1.3); }
   }
 
+  /* === EMOTE RAIN === */
+  @keyframes emotefall {
+    0%   { transform: translateY(0) translateX(0) rotate(0deg) scale(0.6); opacity: 0; }
+    10%  { opacity: 1; }
+    85%  { opacity: 1; }
+    100% { transform: translateY(110vh) translateX(var(--drift)) rotate(var(--spin)) scale(1); opacity: 0; }
+  }
+
   /* Transition overlay */
   #transition-overlay {
     position: fixed;
@@ -494,6 +502,9 @@ function openLetter() {
 
     setTimeout(() => {
       overlay.classList.remove('active');
+      // Auto-start music & emotes the moment letter appears
+      startMusicAuto();
+      startEmoteRain();
     }, 300);
   }, 700);
 }
@@ -587,6 +598,17 @@ function scheduleNotes() {
   musicScheduler = setTimeout(scheduleNotes, 50);
 }
 
+function startMusicAuto() {
+  if (isPlaying) return;
+  if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+  isPlaying = true;
+  nextNoteTime = audioCtx.currentTime + 0.05;
+  scheduleNotes();
+  document.getElementById('playBtn').textContent = '⏸';
+  document.querySelectorAll('.bar').forEach(b => b.classList.add('playing'));
+  spawnMusicNotes();
+}
+
 function toggleMusic() {
   const btn = document.getElementById('playBtn');
   const bars = document.querySelectorAll('.bar');
@@ -598,7 +620,7 @@ function toggleMusic() {
     scheduleNotes();
     btn.textContent = '⏸';
     bars.forEach(b => b.classList.add('playing'));
-    spawnNotes();
+    spawnMusicNotes();
   } else {
     isPlaying = false;
     clearTimeout(musicScheduler);
@@ -611,7 +633,7 @@ function toggleMusic() {
 const noteEmojis = ['♪', '♫', '🎵', '✦', '🌟'];
 let spawnInterval;
 
-function spawnNotes() {
+function spawnMusicNotes() {
   clearInterval(spawnInterval);
   spawnInterval = setInterval(() => {
     if (!isPlaying) { clearInterval(spawnInterval); return; }
@@ -629,7 +651,49 @@ function spawnNotes() {
     setTimeout(() => n.remove(), 3500);
   }, 600);
 }
+
+// ============ EMOTE RAIN 🥳🎉 ============
+const partyEmotes = ['🥳','🎉','🎊','🎈','✨','🌟','💫','🎂','🎁','🥂','🎀','🌸','💖','⭐','🎆'];
+let emoteRainInterval;
+
+function spawnEmote() {
+  const el = document.createElement('div');
+  el.className = 'emote-rain';
+  el.textContent = partyEmotes[Math.floor(Math.random() * partyEmotes.length)];
+  const size = 22 + Math.random() * 28;
+  const startX = Math.random() * 100;
+  const drift = (Math.random() - 0.5) * 120;
+  const duration = 3 + Math.random() * 3;
+  const delay = Math.random() * 0.5;
+  const spin = (Math.random() - 0.5) * 360;
+  el.style.cssText = `
+    position:fixed;
+    top:-60px;
+    left:${startX}%;
+    font-size:${size}px;
+    z-index:200;
+    pointer-events:none;
+    animation: emotefall ${duration}s ${delay}s ease-in forwards;
+    --drift:${drift}px;
+    --spin:${spin}deg;
+  `;
+  document.body.appendChild(el);
+  setTimeout(() => el.remove(), (duration + delay + 0.5) * 1000);
+}
+
+function startEmoteRain() {
+  // Burst of emotes on open
+  for (let i = 0; i < 18; i++) {
+    setTimeout(spawnEmote, i * 120);
+  }
+  // Then continuous gentle rain
+  emoteRainInterval = setInterval(spawnEmote, 400);
+  // Slow down after 8 seconds
+  setTimeout(() => {
+    clearInterval(emoteRainInterval);
+    emoteRainInterval = setInterval(spawnEmote, 1800);
+  }, 8000);
+}
 </script>
 </body>
 </html>
-
