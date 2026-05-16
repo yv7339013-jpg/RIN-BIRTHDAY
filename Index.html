@@ -1,0 +1,635 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Untuk Rin 💌</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,600;1,400&family=Lora:ital,wght@0,400;0,500;1,400&display=swap" rel="stylesheet">
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    --ocean-deep: #0a1f3d;
+    --ocean-mid: #0d3b6e;
+    --ocean-teal: #1a6b8a;
+    --ocean-light: #2892b8;
+    --foam: #a8d8ea;
+    --pearl: #e8f4f8;
+    --gold: #f0c060;
+    --cream: #fdf6e3;
+  }
+
+  body {
+    background: var(--ocean-deep);
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-family: 'Lora', serif;
+    overflow-x: hidden;
+    cursor: default;
+  }
+
+  /* === OCEAN BACKGROUND === */
+  .ocean-bg {
+    position: fixed;
+    inset: 0;
+    z-index: 0;
+    overflow: hidden;
+  }
+
+  .wave-layer {
+    position: absolute;
+    width: 200%;
+    height: 100%;
+    background: radial-gradient(ellipse at 20% 50%, #0d3b6e88 0%, transparent 60%),
+                radial-gradient(ellipse at 80% 30%, #1a6b8a55 0%, transparent 50%),
+                radial-gradient(ellipse at 50% 80%, #0a2a4a99 0%, transparent 60%);
+    animation: drift 18s ease-in-out infinite alternate;
+  }
+
+  .wave-layer:nth-child(2) {
+    background: radial-gradient(ellipse at 60% 40%, #11507a44 0%, transparent 55%),
+                radial-gradient(ellipse at 30% 70%, #1a6b8a33 0%, transparent 45%);
+    animation: drift 24s ease-in-out infinite alternate-reverse;
+  }
+
+  @keyframes drift {
+    from { transform: translateX(0) translateY(0); }
+    to   { transform: translateX(-50px) translateY(20px); }
+  }
+
+  /* Floating particles */
+  .particle {
+    position: absolute;
+    border-radius: 50%;
+    pointer-events: none;
+    animation: floatUp linear infinite;
+    opacity: 0;
+  }
+
+  @keyframes floatUp {
+    0%   { transform: translateY(100vh) translateX(0) scale(0); opacity: 0; }
+    10%  { opacity: 0.6; }
+    90%  { opacity: 0.3; }
+    100% { transform: translateY(-10vh) translateX(30px) scale(1); opacity: 0; }
+  }
+
+  /* Stars */
+  .star {
+    position: absolute;
+    background: white;
+    border-radius: 50%;
+    animation: twinkle ease-in-out infinite;
+  }
+
+  @keyframes twinkle {
+    0%, 100% { opacity: 0.2; transform: scale(1); }
+    50%       { opacity: 0.9; transform: scale(1.4); }
+  }
+
+  /* === ENVELOPE SCREEN === */
+  #envelope-screen {
+    position: relative;
+    z-index: 10;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 28px;
+    animation: fadeIn 1.2s ease forwards;
+  }
+
+  @keyframes fadeIn {
+    from { opacity: 0; transform: translateY(30px); }
+    to   { opacity: 1; transform: translateY(0); }
+  }
+
+  .envelope-wrap {
+    position: relative;
+    cursor: pointer;
+  }
+
+  .envelope-emoji {
+    font-size: clamp(90px, 18vw, 140px);
+    display: block;
+    filter: drop-shadow(0 0 30px #2892b880) drop-shadow(0 0 60px #1a6b8a50);
+    transition: transform 0.3s ease, filter 0.3s ease;
+    animation: gentleBob 3s ease-in-out infinite;
+    user-select: none;
+  }
+
+  @keyframes gentleBob {
+    0%, 100% { transform: translateY(0) rotate(-2deg); }
+    50%       { transform: translateY(-12px) rotate(2deg); }
+  }
+
+  .envelope-emoji:hover {
+    transform: scale(1.08) translateY(-8px) !important;
+    filter: drop-shadow(0 0 50px #2892b8cc) drop-shadow(0 0 90px #1a6b8a80);
+    animation: none;
+  }
+
+  .hint-text {
+    color: var(--foam);
+    font-family: 'Lora', serif;
+    font-style: italic;
+    font-size: clamp(14px, 3vw, 18px);
+    letter-spacing: 0.08em;
+    opacity: 0.8;
+    animation: pulse 2.5s ease-in-out infinite;
+  }
+
+  @keyframes pulse {
+    0%, 100% { opacity: 0.5; }
+    50%       { opacity: 1; }
+  }
+
+  .to-text {
+    color: var(--pearl);
+    font-family: 'Playfair Display', serif;
+    font-size: clamp(22px, 5vw, 32px);
+    letter-spacing: 0.12em;
+    text-shadow: 0 0 20px #2892b860;
+  }
+
+  /* === LETTER SCREEN === */
+  #letter-screen {
+    display: none;
+    position: relative;
+    z-index: 10;
+    width: min(680px, 95vw);
+    animation: letterReveal 1s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+  }
+
+  @keyframes letterReveal {
+    from { opacity: 0; transform: translateY(40px) scale(0.96); }
+    to   { opacity: 1; transform: translateY(0) scale(1); }
+  }
+
+  .letter-paper {
+    background: linear-gradient(160deg, #fdf9f0 0%, #f8f0e0 40%, #fdf6e3 100%);
+    border-radius: 4px 4px 4px 4px;
+    padding: clamp(36px, 8vw, 64px) clamp(32px, 7vw, 56px);
+    position: relative;
+    box-shadow:
+      0 2px 0 #d4b896,
+      0 30px 80px #00000066,
+      0 0 0 1px #d4b89640,
+      inset 0 0 60px #fde8c020;
+  }
+
+  /* Paper lines */
+  .letter-paper::before {
+    content: '';
+    position: absolute;
+    inset: 60px 30px 30px 70px;
+    background: repeating-linear-gradient(
+      to bottom,
+      transparent,
+      transparent 31px,
+      #7fb0c818 32px
+    );
+    pointer-events: none;
+  }
+
+  /* Left red margin */
+  .letter-paper::after {
+    content: '';
+    position: absolute;
+    top: 0; left: 55px; bottom: 0;
+    width: 1px;
+    background: #e8999940;
+    pointer-events: none;
+  }
+
+  .letter-content {
+    position: relative;
+    z-index: 1;
+  }
+
+  .letter-content p {
+    font-family: 'Lora', serif;
+    font-size: clamp(13.5px, 2.2vw, 15.5px);
+    line-height: 2;
+    color: #2c1f0e;
+    margin-bottom: 1.4em;
+    text-align: left;
+  }
+
+  .letter-content p:first-child {
+    font-family: 'Playfair Display', serif;
+    font-size: clamp(18px, 3.5vw, 22px);
+    font-style: italic;
+    color: #1a3a5c;
+    margin-bottom: 1.6em;
+  }
+
+  .letter-content .closing {
+    margin-top: 2em;
+    font-family: 'Playfair Display', serif;
+    font-style: italic;
+    color: #1a3a5c;
+  }
+
+  .letter-content .signature {
+    font-family: 'Playfair Display', serif;
+    font-size: clamp(18px, 3.5vw, 22px);
+    font-style: italic;
+    font-weight: 600;
+    color: #1a3a5c;
+    margin-top: 0.3em;
+  }
+
+  /* Wax seal */
+  .wax-seal {
+    position: absolute;
+    bottom: -22px;
+    right: 40px;
+    width: 54px;
+    height: 54px;
+    background: radial-gradient(circle at 35% 35%, #c0392b, #7b1010);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 22px;
+    box-shadow: 0 4px 12px #00000055, inset 0 2px 4px #ffffff22;
+    z-index: 5;
+  }
+
+  /* Decorative flowers */
+  .deco-corner {
+    position: absolute;
+    font-size: 22px;
+    opacity: 0.4;
+    pointer-events: none;
+  }
+  .deco-corner.tl { top: 14px; left: 18px; transform: rotate(-15deg); }
+  .deco-corner.tr { top: 14px; right: 18px; transform: rotate(15deg); }
+  .deco-corner.bl { bottom: 36px; left: 18px; transform: rotate(15deg); }
+
+  /* === MUSIC PLAYER === */
+  .music-player {
+    margin-top: 32px;
+    background: linear-gradient(135deg, #0d3b6edd, #1a6b8aaa);
+    border: 1px solid #2892b855;
+    border-radius: 50px;
+    padding: 12px 24px;
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    backdrop-filter: blur(12px);
+    box-shadow: 0 8px 32px #00000044, 0 0 0 1px #a8d8ea22;
+  }
+
+  .play-btn {
+    width: 40px;
+    height: 40px;
+    background: linear-gradient(135deg, var(--foam), var(--ocean-light));
+    border: none;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    font-size: 16px;
+    transition: transform 0.2s, box-shadow 0.2s;
+    flex-shrink: 0;
+    box-shadow: 0 2px 10px #1a6b8a88;
+  }
+
+  .play-btn:hover {
+    transform: scale(1.1);
+    box-shadow: 0 4px 20px #2892b8aa;
+  }
+
+  .music-info {
+    flex: 1;
+    min-width: 0;
+  }
+
+  .music-title {
+    color: var(--pearl);
+    font-family: 'Playfair Display', serif;
+    font-size: 13px;
+    font-style: italic;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  .music-note-visual {
+    display: flex;
+    gap: 3px;
+    align-items: flex-end;
+    height: 20px;
+    margin-top: 5px;
+  }
+
+  .bar {
+    width: 3px;
+    background: var(--foam);
+    border-radius: 2px;
+    opacity: 0.6;
+    transform-origin: bottom;
+  }
+
+  .bar.playing {
+    animation: barDance 0.6s ease-in-out infinite alternate;
+  }
+
+  .bar:nth-child(1) { height: 8px;  animation-delay: 0s;    }
+  .bar:nth-child(2) { height: 14px; animation-delay: 0.15s; }
+  .bar:nth-child(3) { height: 10px; animation-delay: 0.3s;  }
+  .bar:nth-child(4) { height: 16px; animation-delay: 0.1s;  }
+  .bar:nth-child(5) { height: 7px;  animation-delay: 0.25s; }
+
+  @keyframes barDance {
+    from { transform: scaleY(0.3); opacity: 0.4; }
+    to   { transform: scaleY(1.5); opacity: 1; }
+  }
+
+  /* === FLOATING NOTES === */
+  .music-note-float {
+    position: fixed;
+    font-size: 20px;
+    pointer-events: none;
+    z-index: 5;
+    animation: noteFloat 3s ease-out forwards;
+    opacity: 0;
+  }
+
+  @keyframes noteFloat {
+    0%   { opacity: 0; transform: translateY(0) rotate(0deg) scale(0.5); }
+    20%  { opacity: 1; }
+    80%  { opacity: 0.7; }
+    100% { opacity: 0; transform: translateY(-120px) rotate(25deg) scale(1.3); }
+  }
+
+  /* Transition overlay */
+  #transition-overlay {
+    position: fixed;
+    inset: 0;
+    z-index: 100;
+    background: radial-gradient(circle, #a8d8ea, #0a1f3d);
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.6s ease;
+  }
+
+  #transition-overlay.active {
+    opacity: 1;
+    pointer-events: all;
+  }
+</style>
+</head>
+<body>
+
+<!-- Ocean background -->
+<div class="ocean-bg">
+  <div class="wave-layer"></div>
+  <div class="wave-layer"></div>
+</div>
+
+<!-- Transition overlay -->
+<div id="transition-overlay"></div>
+
+<!-- Envelope screen -->
+<div id="envelope-screen">
+  <div class="to-text">Untuk Rin ✦</div>
+  <div class="envelope-wrap" onclick="openLetter()">
+    <span class="envelope-emoji">💌</span>
+  </div>
+  <div class="hint-text">— ketuk untuk membuka —</div>
+</div>
+
+<!-- Letter screen -->
+<div id="letter-screen">
+  <div class="letter-paper">
+    <div class="deco-corner tl">🌸</div>
+    <div class="deco-corner tr">🌿</div>
+    <div class="deco-corner bl">✦</div>
+    <div class="wax-seal">🌊</div>
+
+    <div class="letter-content">
+      <p>Rin,</p>
+      <p>Selamat ulang tahun yang ke-15.</p>
+      <p>Gue nggak tau lo bakal ngerasa ini penting atau nggak, atau malah nganggep ini hari yang biasa aja. Tapi gue tetep pengen nulis ini, karena gue tau kadang hari ulang tahun justru bikin orang ngerasa aneh—kayak ada tekanan buat "bahagia", padahal hati lagi nggak selalu sejalan.</p>
+      <p>Gue nggak bakal maksa lo buat ngerayain atau ngerasa apa-apa yang nggak lo rasain. Gue cuma pengen lo tau kalau hari ini tetap berarti, walaupun lo ngerasa biasa aja.</p>
+      <p>Lo udah sampai di titik ini. 15 tahun hidup, dengan semua hal yang orang lain mungkin nggak tau atau nggak lihat. Dan entah lo sadar atau nggak, itu bukan hal yang ringan. Ada banyak hari yang mungkin lo lewatin dengan diam, dengan capek, atau dengan nahan semuanya sendiri. Tapi lo tetap ada sampai sekarang.</p>
+      <p>Gue nggak akan bilang hidup lo harus selalu baik mulai sekarang, karena gue tau itu nggak realistis. Tapi gue pengen lo pelan-pelan punya ruang yang lebih tenang di dalam hidup lo sendiri. Ruang di mana lo nggak selalu harus kuat, nggak selalu harus ngerti semuanya, dan nggak selalu harus tahan sendirian.</p>
+      <p>Kalau lo ngerasa kosong di hari ini, atau ngerasa ini cuma hari biasa, itu juga nggak apa-apa. Lo nggak harus maksa diri lo ngerasain sesuatu yang nggak datang.</p>
+      <p>Tapi gue harap, di balik semua itu, lo tetap bisa percaya satu hal kecil: kalau lo masih punya kesempatan buat jalan pelan-pelan ke arah hidup yang lebih enak buat lo sendiri. Nggak harus cepat, nggak harus sekarang, tapi tetap ada kemungkinan itu.</p>
+      <p>Gue di sini, nggak jauh. Tetep jadi orang yang dengerin lo, walaupun lo lagi nggak banyak ngomong.</p>
+      <p class="closing">Selamat ulang tahun, Rin.</p>
+      <p class="signature">Dari Ri. 🌊</p>
+    </div>
+  </div>
+
+  <!-- Music player -->
+  <div class="music-player">
+    <button class="play-btn" id="playBtn" onclick="toggleMusic()">▶</button>
+    <div class="music-info">
+      <div class="music-title">🎵 Happy Birthday — Vocaloid Style</div>
+      <div class="music-note-visual" id="musicBars">
+        <div class="bar"></div>
+        <div class="bar"></div>
+        <div class="bar"></div>
+        <div class="bar"></div>
+        <div class="bar"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+// ============ STARS & PARTICLES ============
+function createStars(n) {
+  const bg = document.querySelector('.ocean-bg');
+  for (let i = 0; i < n; i++) {
+    const s = document.createElement('div');
+    s.className = 'star';
+    const size = Math.random() * 2.5 + 0.5;
+    s.style.cssText = `
+      width:${size}px; height:${size}px;
+      top:${Math.random()*100}%;
+      left:${Math.random()*100}%;
+      animation-duration:${2+Math.random()*4}s;
+      animation-delay:${Math.random()*5}s;
+    `;
+    bg.appendChild(s);
+  }
+}
+
+function createParticles(n) {
+  const bg = document.querySelector('.ocean-bg');
+  const colors = ['#a8d8ea', '#2892b8', '#e8f4f8', '#f0c060', '#1a6b8a'];
+  for (let i = 0; i < n; i++) {
+    const p = document.createElement('div');
+    p.className = 'particle';
+    const size = Math.random() * 5 + 2;
+    p.style.cssText = `
+      width:${size}px; height:${size}px;
+      left:${Math.random()*100}%;
+      bottom:0;
+      background:${colors[Math.floor(Math.random()*colors.length)]};
+      animation-duration:${8+Math.random()*12}s;
+      animation-delay:${Math.random()*10}s;
+    `;
+    bg.appendChild(p);
+  }
+}
+
+createStars(80);
+createParticles(25);
+
+// ============ OPEN LETTER ============
+function openLetter() {
+  const overlay = document.getElementById('transition-overlay');
+  overlay.classList.add('active');
+
+  setTimeout(() => {
+    document.getElementById('envelope-screen').style.display = 'none';
+    document.getElementById('letter-screen').style.display = 'block';
+
+    setTimeout(() => {
+      overlay.classList.remove('active');
+    }, 300);
+  }, 700);
+}
+
+// ============ MUSIC (Web Audio API) ============
+let audioCtx = null;
+let isPlaying = false;
+let musicScheduler = null;
+let nextNoteTime = 0;
+let noteIndex = 0;
+
+// Vocaloid-style "Tink" Happy Birthday melody
+// Notes: frequency in Hz, duration in beats
+const BPM = 100;
+const beatDur = 60 / BPM;
+
+function note(freq, dur) { return {freq, dur}; }
+const R = 0; // rest
+
+const melody = [
+  // "Ti-nk tink tink-k tink tink" (Happy Birthday to You pattern)
+  note(523.25, 0.5), note(523.25, 0.5),  // Hap-py
+  note(587.33, 1.0),                       // Birth-
+  note(523.25, 1.0),                       // day
+  note(698.46, 1.0),                       // to
+  note(659.25, 2.0),                       // you
+
+  note(523.25, 0.5), note(523.25, 0.5),
+  note(587.33, 1.0),
+  note(523.25, 1.0),
+  note(783.99, 1.0),
+  note(698.46, 2.0),
+
+  note(523.25, 0.5), note(523.25, 0.5),
+  note(1046.50, 1.0),
+  note(880.00, 1.0),
+  note(698.46, 1.0),
+  note(659.25, 1.0),
+  note(587.33, 1.0),
+
+  note(932.33, 0.5), note(932.33, 0.5),
+  note(880.00, 1.0),
+  note(698.46, 1.0),
+  note(783.99, 1.0),
+  note(698.46, 2.5),
+];
+
+function playTink(ctx, freq, when, dur) {
+  if (!freq) return;
+  const osc = ctx.createOscillator();
+  const gain = ctx.createGain();
+  const osc2 = ctx.createOscillator();
+  const gain2 = ctx.createGain();
+  const master = ctx.createGain();
+
+  // Main bell tone
+  osc.type = 'sine';
+  osc.frequency.setValueAtTime(freq, when);
+  osc.frequency.exponentialRampToValueAtTime(freq * 0.99, when + dur * beatDur);
+
+  // Harmonic overtone (vocaloid bell shimmer)
+  osc2.type = 'sine';
+  osc2.frequency.setValueAtTime(freq * 2, when);
+
+  gain.gain.setValueAtTime(0, when);
+  gain.gain.linearRampToValueAtTime(0.4, when + 0.008);
+  gain.gain.exponentialRampToValueAtTime(0.001, when + Math.min(dur * beatDur, 1.2));
+
+  gain2.gain.setValueAtTime(0, when);
+  gain2.gain.linearRampToValueAtTime(0.12, when + 0.005);
+  gain2.gain.exponentialRampToValueAtTime(0.001, when + Math.min(dur * beatDur * 0.5, 0.6));
+
+  master.gain.setValueAtTime(0.55, when);
+
+  osc.connect(gain); gain.connect(master);
+  osc2.connect(gain2); gain2.connect(master);
+  master.connect(ctx.destination);
+
+  osc.start(when); osc.stop(when + dur * beatDur + 0.5);
+  osc2.start(when); osc2.stop(when + dur * beatDur * 0.5 + 0.3);
+}
+
+function scheduleNotes() {
+  if (!isPlaying) return;
+  while (nextNoteTime < audioCtx.currentTime + 0.25) {
+    const n = melody[noteIndex % melody.length];
+    playTink(audioCtx, n.freq, nextNoteTime, n.dur);
+    nextNoteTime += n.dur * beatDur;
+    noteIndex++;
+  }
+  musicScheduler = setTimeout(scheduleNotes, 50);
+}
+
+function toggleMusic() {
+  const btn = document.getElementById('playBtn');
+  const bars = document.querySelectorAll('.bar');
+
+  if (!isPlaying) {
+    if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+    isPlaying = true;
+    nextNoteTime = audioCtx.currentTime + 0.05;
+    scheduleNotes();
+    btn.textContent = '⏸';
+    bars.forEach(b => b.classList.add('playing'));
+    spawnNotes();
+  } else {
+    isPlaying = false;
+    clearTimeout(musicScheduler);
+    btn.textContent = '▶';
+    bars.forEach(b => b.classList.remove('playing'));
+  }
+}
+
+// Floating music notes spawner
+const noteEmojis = ['♪', '♫', '🎵', '✦', '🌟'];
+let spawnInterval;
+
+function spawnNotes() {
+  clearInterval(spawnInterval);
+  spawnInterval = setInterval(() => {
+    if (!isPlaying) { clearInterval(spawnInterval); return; }
+    const n = document.createElement('div');
+    n.className = 'music-note-float';
+    n.textContent = noteEmojis[Math.floor(Math.random() * noteEmojis.length)];
+    n.style.cssText = `
+      left:${15+Math.random()*70}%;
+      bottom:${10+Math.random()*15}%;
+      color:hsl(${190+Math.random()*40},80%,${70+Math.random()*20}%);
+      font-size:${14+Math.random()*14}px;
+      animation-duration:${2+Math.random()*2}s;
+    `;
+    document.body.appendChild(n);
+    setTimeout(() => n.remove(), 3500);
+  }, 600);
+}
+</script>
+</body>
+</html>
+
